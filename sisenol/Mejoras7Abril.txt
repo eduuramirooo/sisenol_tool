@@ -1,0 +1,21 @@
+Gestion de usuarios
+
+Dar de alta
+Dar de baja
+Editar
+Clonar proyecto
+
+Producto
+	Mejorar gestion de menu admin
+	De 1 a 3 documentos .zip
+
+Planos
+	Para descargar
+	Quito modal
+
+Crear tabla proyecto 
+	Productos-RutaCarpeta(mostrar como ejemplo apache)-Notas de instalacion(Agregar Documento y strings)
+
+
+	
+
