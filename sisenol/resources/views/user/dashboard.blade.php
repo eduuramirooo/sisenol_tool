@@ -8,7 +8,7 @@
     </a>
     <a href="{{ route('proyecto.archivos') }}"
        class="block text-center bg-white p-4 border rounded shadow hover:bg-[#DCE1DE] transition">
-        Ver instalación
+        Ver documentación
     </a>
     <a href="{{ route('producto.notas') }}"
        class="block text-center bg-white p-4 border rounded shadow hover:bg-[#DCE1DE] transition">

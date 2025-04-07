@@ -28,23 +28,52 @@ public function dashboard()
     ->select('proyectos.nombre', 'proyectos.carpeta')
     ->first();
 
-$archivos = [];
+    // Obtener archivos de la carpeta del proyecto
+    $archivos = [];
+
+    if ($proyecto && $proyecto->carpeta) {
+        $rutaCompleta = public_path($proyecto->carpeta);
+    
+        if (is_dir($rutaCompleta)) {
+            $files = array_diff(scandir($rutaCompleta), ['.', '..']);
+            foreach ($files as $file) {
+                $filePath = $rutaCompleta . DIRECTORY_SEPARATOR . $file;
+    
+                // Ignorar carpeta llamada "nombre"
+                if (is_dir($filePath) && $file === 'notes') {
+                    continue;
+                }
+    
+                // Solo incluir archivos (no carpetas)
+                if (is_file($filePath)) {
+                    $archivos[] = [
+                        'nombre' => $file,
+                        'peso' => round(filesize($filePath) / 1024, 2), // en KB
+                        'url' => asset($proyecto->carpeta . '/' . $file),
+                    ];
+                }
+            }
+        }
+    }
+    
+$notasDocs = [];
 
 if ($proyecto && $proyecto->carpeta) {
-    $rutaCompleta = public_path($proyecto->carpeta);
+    $rutaNotas = public_path($proyecto->carpeta . '/notes');
 
-    if (is_dir($rutaCompleta)) {
-        $files = array_diff(scandir($rutaCompleta), ['.', '..']);
-        foreach ($files as $file) {
-            $filePath = $rutaCompleta . DIRECTORY_SEPARATOR . $file;
-            $archivos[] = [
-                'nombre' => $file,
-                'peso' => round(filesize($filePath) / 1024, 2), // en KB
-                'url' => asset($proyecto->carpeta . '/' . $file),
+    if (is_dir($rutaNotas)) {
+        $archivosNotas = array_diff(scandir($rutaNotas), ['.', '..']);
+        foreach ($archivosNotas as $archivo) {
+            $rutaCompleta = $rutaNotas . DIRECTORY_SEPARATOR . $archivo;
+            $notasDocs[] = [
+                'nombre' => $archivo,
+                'peso' => round(filesize($rutaCompleta) / 1024, 2), // en KB
+                'url' => asset($proyecto->carpeta . '/notes/' . $archivo)
             ];
         }
     }
 }
+
 
 
     $count = $productos->count();
@@ -62,7 +91,8 @@ if ($proyecto && $proyecto->carpeta) {
         'fechaMan',
         'cantidad',
         'archivos',
-        'proyecto'
+        'proyecto',
+        'notasDocs'
     ));
 }
 

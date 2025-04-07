@@ -21,7 +21,7 @@
     </div>
     <div id="menu-buttons" class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center hidden sm:grid">
         <button onclick="mostrarSeccion('productos')" class="bg-white border rounded shadow hover:bg-[#DCE1DE] py-4 font-medium w-full transition transform hover:scale-105 duration-300">Ver productos</button>
-        <button onclick="mostrarSeccion('instalacion')" class="bg-white border rounded shadow hover:bg-[#DCE1DE] py-4 font-medium w-full transition transform hover:scale-105 duration-300">Ver instalación</button>
+        <button onclick="mostrarSeccion('instalacion')" class="bg-white border rounded shadow hover:bg-[#DCE1DE] py-4 font-medium w-full transition transform hover:scale-105 duration-300">Ver documentacion</button>
         <button onclick="mostrarSeccion('notas')" class="bg-white border rounded shadow hover:bg-[#DCE1DE] py-4 font-medium w-full transition transform hover:scale-105 duration-300">Ver notas</button>
     </div>
 
@@ -67,25 +67,35 @@
 </div>
 
 
-        <!-- Notas -->
-        <div id="seccion-notas" class="hidden opacity-0 transition-opacity duration-500">
-            <h2 class="text-lg font-semibold">Notas del instaladora</h2>
-            @foreach ($notas as $nota)
-                <div class="bg-[#DCE1DE] p-4 rounded-md shadow-sm">
-                    {{ $nota->contenido }}
-                </div>
-            @endforeach
+<!-- Notas -->
+<div id="seccion-notas" class="hidden opacity-0 transition-opacity duration-500">
+    <h2 class="text-lg font-semibold">Notas del instalador</h2>
+
+    {{-- Notas desde base de datos --}}
+    @foreach ($notas as $nota)
+        <div class="bg-[#DCE1DE] p-4 rounded-md shadow-sm">
+            {{ $nota->contenido }}
         </div>
-    </div>
+    @endforeach
+
+    {{-- Documentos en la carpeta proyecto/notes --}}
+    @if (!empty($notasDocs))
+        <h3 class="text-md font-medium mt-6 mb-2">Archivos adjuntos</h3>
+        <ul class="space-y-2">
+            @foreach ($notasDocs as $doc)
+                <li class="flex justify-between items-center bg-white border p-3 rounded shadow-sm hover:bg-gray-50">
+                    <a href="{{ $doc['url'] }}" download class="text-[#216869] font-medium hover:underline">
+                        {{ $doc['nombre'] }}
+                    </a>
+                    <span class="text-sm text-gray-500">{{ $doc['peso'] }} KB</span>
+                </li>
+            @endforeach
+        </ul>
+    @endif
 </div>
 
-<!-- Modal para imagen grande -->
-<div id="plano-modal" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-50 hidden flex items-center justify-center">
-    <div class="relative w-full max-w-md p-4 animate-fade-in-up">
-        <button onclick="cerrarPlano()" class="absolute top-2 right-2 text-white text-2xl font-bold">&times;</button>
-        <img id="plano-ampliado" src="" alt="Plano ampliado" class="w-full rounded shadow-lg">
-    </div>
-</div>
+
+
 <script src="{{ asset('js/dashboard.js') }}" defer></script>
 
 
