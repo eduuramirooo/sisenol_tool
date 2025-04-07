@@ -61,4 +61,8 @@ class LoginController extends Controller
         session()->forget(['id', 'username', 'alias', 'tipo']);
         return redirect('/');
     }
+    public function formulario()
+    {
+        return view('welcome');
+    }
 }

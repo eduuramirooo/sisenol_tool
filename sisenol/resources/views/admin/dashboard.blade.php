@@ -26,12 +26,12 @@
     <button onclick="mostrarSeccion('notas')" class="bg-white border rounded shadow hover:bg-[#DCE1DE] py-4 font-medium w-full transition transform hover:scale-105 duration-300">Notas</button>
 </div>
 
-
     <!-- Contenido dinámico -->
     <div class="mt-8 space-y-6 text-sm text-[#292727]">
         <!-- Usuarios -->
         <div id="seccion-usuarios" class="transition-opacity duration-500 opacity-100">
-            <h2 class="text-lg font-semibold">Alta de usuarios</h2>
+            <h2 class="text-lg font-semibold">Gestión de usuarios</h2>
+            <!-- Alta de usuarios -->
             <form action="{{ route('admin.registrarUsuario') }}" method="POST" class="bg-white p-6 rounded shadow space-y-4">
                 @csrf
                 <input type="text" name="username" placeholder="Usuario" class="w-full border px-4 py-2 rounded">
@@ -43,6 +43,74 @@
                 </select>
                 <button type="submit" class="bg-black text-white px-6 py-4 w-[90%] rounded hover:bg-gray-800 transition">Registrar usuario</button>
             </form>
+
+            <!-- Lista de usuarios existentes -->
+            <div class="mt-8">
+                <h3 class="font-semibold text-md mb-2">Usuarios activos</h3>
+                <form method="GET" class="bg-gray-50 p-4 rounded shadow-md mb-6 flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-4 sm:space-y-0">
+
+<!-- Buscar -->
+<input type="text" name="buscar" value="{{ request('buscar') }}" placeholder="Buscar por alias o usuario"
+    class="border border-gray-300 px-4 py-2 rounded w-full sm:w-1/3 focus:outline-none focus:ring-2 focus:ring-[#49A078] focus:border-transparent">
+
+<!-- Estado -->
+<select name="estado" class="border border-gray-300 px-4 py-2 rounded w-full sm:w-1/5 focus:outline-none focus:ring-2 focus:ring-[#49A078] focus:border-transparent">
+    <option value="">Todos</option>
+    <option value="1" {{ request('estado') == '1' ? 'selected' : '' }}>Activos</option>
+    <option value="0" {{ request('estado') == '0' ? 'selected' : '' }}>Inactivos</option>
+</select>
+
+<!-- Tipo -->
+<select name="tipo" class="border border-gray-300 px-4 py-2 rounded w-full sm:w-1/5 focus:outline-none focus:ring-2 focus:ring-[#49A078] focus:border-transparent">
+    <option value="">Todos los tipos</option>
+    <option value="admin" {{ request('tipo') == 'admin' ? 'selected' : '' }}>Admin</option>
+    <option value="user" {{ request('tipo') == 'user' ? 'selected' : '' }}>User</option>
+</select>
+
+<!-- Botones -->
+<div class="flex space-x-2 w-full sm:w-auto">
+    <a href="{{ route('admin.menu') }}" class="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300 transition  w-full text-center">Borrar</a>
+    <button type="submit" class="bg-black text-white px-4 py-2 rounded hover:bg-[#216869] transition w-full">Filtrar</button>
+</div>
+</form>
+
+
+<table class="w-full text-left text-sm bg-white rounded shadow transition-all duration-500 ease-in-out">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="px-4 py-2">Alias</th>
+                            <th class="px-4 py-2">Username</th>
+                            <th class="px-4 py-2">Tipo</th>
+                            <th class="px-4 py-2">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($usuarios as $usuario)
+                        <tr class="border-t">
+                            <td class="px-4 py-2">{{ $usuario->alias }}</td>
+                            <td class="px-4 py-2">{{ $usuario->username }}</td>
+                            <td class="px-4 py-2">{{ $usuario->tipo }}</td>
+                            <td class="px-4 py-2 space-x-2">
+                            @if ($usuario->activo)
+                                <form action="{{ route('admin.eliminarUsuario', $usuario->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit" class="text-red-500 hover:underline">Eliminar</button>
+                                </form>
+                            @else
+                                <form action="{{ route('admin.activarUsuario', $usuario->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit" class="text-green-600 hover:underline">Re-activar</button>
+                                </form>
+                            @endif
+
+                            <a href="{{ route('admin.editarUsuarioForm', $usuario->id) }}" class="text-blue-600 hover:underline">Editar</a>
+                        </td>
+
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Asignar productos -->
@@ -84,18 +152,6 @@
     </form>
 </div>
 
-<script>
-    function mostrarInput() {
-        const selector = document.getElementById('productoSelector');
-        const fileInput = document.getElementById('fileInput');
-        if (selector.value) {
-            fileInput.classList.remove('hidden');
-        } else {
-            fileInput.classList.add('hidden');
-        }
-    }
-</script>
-
         <!-- Crear producto -->
 <div id="seccion-crear" class="hidden opacity-0 transition-opacity duration-500">
     <h2 class="text-lg font-semibold">Crear nuevo producto</h2>
@@ -109,7 +165,6 @@
     </form>
 </div>
 
-
         <div id="seccion-notas" class="hidden opacity-0 transition-opacity duration-500">
             <h2 class="text-lg font-semibold">Modificar notas</h2>
             <p>Listado y edición de notas por usuario.</p>
@@ -117,43 +172,5 @@
     </div>
 </div>
 
-<script>
-    function mostrarSeccion(seccion) {
-        ['usuarios', 'asignar', 'documentos', 'notas', 'crear'].forEach(id => {
-            const div = document.getElementById('seccion-' + id);
-            const btn = document.querySelector(`#menu-buttons button[onclick*="${id}"]`);
-
-            if (id === seccion) {
-                div.classList.remove('hidden');
-                btn.classList.remove('bg-white');
-                btn.classList.add('bg-[#49A078]');
-
-                const children = div.querySelectorAll('div, form, p');
-                children.forEach((el, i) => {
-                    el.style.opacity = 0;
-                    el.style.transform = 'translateY(20px)';
-                    el.style.transition = `opacity 400ms ease ${i * 100}ms, transform 400ms ease ${i * 100}ms`;
-                    setTimeout(() => {
-                        el.style.opacity = 1;
-                        el.style.transform = 'translateY(0)';
-                    }, 50);
-                });
-
-                setTimeout(() => div.classList.add('opacity-100'), 10);
-                div.classList.remove('opacity-0');
-            } else {
-                div.classList.remove('opacity-100');
-                div.classList.add('opacity-0');
-                setTimeout(() => div.classList.add('hidden'), 500);
-                btn.classList.remove('bg-[#49A078]');
-            }
-        });
-    }
-
-    function toggleMenu() {
-        const menu = document.getElementById('menu-buttons');
-        menu.classList.toggle('hidden');
-    }
-    </script>
-
+<script src="{{ asset('js/admin.js') }}" defer></script>
 @endsection

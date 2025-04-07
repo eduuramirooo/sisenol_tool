@@ -1,14 +1,14 @@
 function mostrarSeccion(seccion) {
-    ['productos', 'instalacion', 'notas'].forEach(id => {
+    ['usuarios', 'asignar', 'documentos', 'notas', 'crear'].forEach(id => {
         const div = document.getElementById('seccion-' + id);
         const btn = document.querySelector(`#menu-buttons button[onclick*="${id}"]`);
-        const welcome= document.getElementById('welcome-message');
+
         if (id === seccion) {
             div.classList.remove('hidden');
             btn.classList.remove('bg-white');
             btn.classList.add('bg-[#49A078]');
-            welcome.classList.add('hidden');
-            const children = div.querySelectorAll('div');
+
+            const children = div.querySelectorAll('div, form, p');
             children.forEach((el, i) => {
                 el.style.opacity = 0;
                 el.style.transform = 'translateY(20px)';
@@ -25,7 +25,6 @@ function mostrarSeccion(seccion) {
             div.classList.remove('opacity-100');
             div.classList.add('opacity-0');
             setTimeout(() => div.classList.add('hidden'), 500);
-            btn.classList.add('bg-white');  
             btn.classList.remove('bg-[#49A078]');
         }
     });
@@ -35,4 +34,8 @@ function toggleMenu() {
     const menu = document.getElementById('menu-buttons');
     menu.classList.toggle('hidden');
 }
-
+document.addEventListener('DOMContentLoaded', () => {
+    const tabla = document.querySelector('table');
+    tabla.classList.add('opacity-0');
+    setTimeout(() => tabla.classList.remove('opacity-0'), 100);
+});

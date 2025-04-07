@@ -51,22 +51,25 @@
 
     <!-- Footer -->
     <footer class="bg-white text-gray-600 border-t w-full fixed bottom-0 left-0 z-40">
-        <div class="px-6 py-6 flex flex-col md:flex-row justify-between items-center text-sm max-w-7xl mx-auto">
-            <div class="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-6">
-                <img src="{{ asset('img/icon.png') }}" alt="Logo Sisenol" class="h-12">
-                <div class="flex space-x-4">
-                    <a href="#" class="hover:underline">Quiénes somos</a>
-                    <a href="#" class="hover:underline">Soluciones</a>
-                    <a href="#" class="hover:underline">Contáctanos</a>
-                </div>
-            </div>
-            <div class="text-center md:text-right text-xs text-gray-400 mt-4 md:mt-0">
-                Diseñado por Sisenol Solutions © 2023. Todos los derechos reservados. <br>
-                <a href="#" class="hover:underline">Política de calidad y medio ambiente</a> |
-                <a href="#" class="hover:underline">Política de privacidad</a>
+    <div class="px-6 py-4 flex flex-col md:flex-row justify-between items-center text-sm max-w-7xl mx-auto space-y-4 md:space-y-0">
+        <!-- Logo y enlaces -->
+        <div class="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-6 text-center md:text-left">
+            <img src="{{ asset('img/icon.png') }}" alt="Logo Sisenol" class="h-8 md:h-10 mx-auto md:mx-0">
+            <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0">
+                <a href="#" class="hover:underline">Quiénes somos</a>
+                <a href="#" class="hover:underline">Soluciones</a>
+                <a href="#" class="hover:underline">Contáctanos</a>
             </div>
         </div>
-    </footer>
+
+        <!-- Información legal -->
+        <div class="text-center md:text-right text-xs text-gray-400">
+            Diseñado por Sisenol Solutions © 2023. Todos los derechos reservados. <br>
+            <a href="#" class="hover:underline">Política de calidad y medio ambiente</a> |
+            <a href="#" class="hover:underline">Política de privacidad</a>
+        </div>
+    </div>
+</footer>
 </body>
 </html>
 

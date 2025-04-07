@@ -10,7 +10,7 @@ class CheckSession
     public function handle(Request $request, Closure $next)
     {
         if (!session()->has('id')) {
-            return redirect('/formulario')->with('error', 'Debes iniciar sesión');
+            return redirect('/')->with('error', 'Debes iniciar sesión como administrador para acceder a esta sección.');
         }
 
         return $next($request);

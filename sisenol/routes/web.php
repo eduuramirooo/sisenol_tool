@@ -32,6 +32,10 @@ Route::middleware(['check.session'])->group(function () {
     Route::post('/admin/actualizar-nota', [AdminController::class, 'actualizarNota'])->name('admin.actualizarNota');
     Route::post('/admin/crear-producto', [AdminController::class, 'crearProducto'])->name('admin.crearProducto');
     Route::get('/archivos-proyecto', [ProductoController::class, 'mostrarArchivosProyecto'])->name('proyecto.archivos');
+    Route::get('/admin/usuario/{id}/editar', [AdminController::class, 'editarUsuarioForm'])->name('admin.editarUsuarioForm');
+    Route::post('/admin/usuario/{id}/actualizar', [AdminController::class, 'actualizarUsuario'])->name('admin.actualizarUsuario');
+    Route::post('/admin/usuario/{id}/eliminar', [AdminController::class, 'eliminarUsuario'])->name('admin.eliminarUsuario');
+    Route::post('/admin/activar-usuario/{id}', [AdminController::class, 'activarUsuario'])->name('admin.activarUsuario');
 
 });
 
