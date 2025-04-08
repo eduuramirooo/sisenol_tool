@@ -4,42 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sisenol Solutions</title>
-    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100 pt-16 pb-28">
     <!-- Header -->
     <header class="bg-white text-[#292727] w-full fixed top-0 left-0 z-50 shadow">
-        <div class="px-6 py-4 flex justify-between items-center max-w-7xl mx-auto">
-            <div class="flex items-center space-x-3">
-                <a href="/">
-                    <img src="{{ asset('img/logo.png') }}" alt="Sisenol Solutions" class="h-8" onerror="this.onerror=null; this.src='{{ asset('img/default-logo.png') }}';">
-                </a>
-            </div>
-            <nav class="flex space-x-6 text-sm items-center">
-                <a href="#" class="hover:text-[#9CC5A1]">Soluciones</a>
-                <a href="#" class="hover:text-[#9CC5A1]">Proyectos</a>
-                <a href="#" class="hover:text-[#9CC5A1]">Contáctanos</a>
-
-                @if(session('id'))
-                    @php
-                        $tipo = DB::table('usuarios')->where('id', session('id'))->value('tipo');
-                    @endphp
-
-                    @if($tipo === 'admin')
-                        <a href="{{ route('admin.menu') }}" class="ml-4 px-4 py-1.5 text-sm bg-[#216869] text-[#DCE1DE] rounded-md hover:bg-[#49A078] transition duration-300 shadow">
-                            Menú admin
-                        </a>
-                    @endif
-                    <form action="{{ route('login.logout') }}" method="GET">
-                        <button type="submit" class="ml-4 px-4 py-1.5 text-sm bg-[#49A078] text-[#DCE1DE] rounded-md hover:bg-[#216869] transition duration-300 shadow">
-                            &#x274C; Cerrar sesión
-                        </button>
-                    </form>
-                @endif
-            </nav>
+    <div class="px-6 py-4 flex justify-between items-center max-w-7xl mx-auto">
+        <!-- Logo -->
+        <div class="flex items-center space-x-3">
+            <a href="/">
+                <img src="{{ asset('img/logo.png') }}" alt="Sisenol Solutions" class="h-8" onerror="this.onerror=null; this.src='{{ asset('img/default-logo.png') }}';">
+            </a>
         </div>
-    </header>
+
+        <!-- Botón hamburguesa móvil -->
+        <button class="sm:hidden text-[#216869] focus:outline-none" onclick="document.getElementById('nav-menu').classList.toggle('hidden')">
+            ☰
+        </button>
+
+        <!-- Navegación -->
+        <nav id="nav-menu" class="hidden sm:flex sm:space-x-6 sm:items-center text-sm absolute sm:static top-full left-0 w-full sm:w-auto bg-white sm:bg-transparent shadow sm:shadow-none px-6 sm:px-0 py-4 sm:py-0 z-40">
+            <a href="#" class="block py-2 sm:py-0 hover:text-[#9CC5A1]">Soluciones</a>
+            <a href="#" class="block py-2 sm:py-0 hover:text-[#9CC5A1]">Proyectos</a>
+            <a href="#" class="block py-2 sm:py-0 hover:text-[#9CC5A1]">Contáctanos</a>
+
+            @if(session('id'))
+                @php
+                    $tipo = DB::table('usuarios')->where('id', session('id'))->value('tipo');
+                @endphp
+
+                @if($tipo === 'admin')
+                    <a href="{{ route('admin.menu') }}" class="block py-2 sm:py-0 sm:ml-4 px-4 py-1.5 text-sm bg-[#216869] text-[#DCE1DE] rounded-md hover:bg-[#49A078] transition duration-300 shadow text-center">
+                        Menú admin
+                    </a>
+                @endif
+
+                <form action="{{ route('login.logout') }}" method="GET" class="block sm:ml-4">
+                    <button type="submit" class="w-full sm:w-auto mt-2 sm:mt-0 px-4 py-1.5 text-sm bg-[#49A078] text-[#DCE1DE] rounded-md hover:bg-[#216869] transition duration-300 shadow">
+                        &#x274C; Cerrar sesión
+                    </button>
+                </form>
+            @endif
+        </nav>
+    </div>
+</header>
+
 
 
     <!-- Contenido -->
