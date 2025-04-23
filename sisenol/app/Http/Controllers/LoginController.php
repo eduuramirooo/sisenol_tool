@@ -12,22 +12,27 @@ class LoginController extends Controller
     {
         $username = $request->input('username');
         $password = $request->input('password');
-
+    
         // Buscar usuario por username
         $usuario = DB::table('usuarios')->where('username', $username)->first();
-
+    
         if ($usuario && Hash::check($password, $usuario->password)) {
-            session([
-                'id' => $usuario->id,
-                'username' => $usuario->username,
-                'alias' => $usuario->alias,
-                'tipo' => $usuario->tipo
-            ]);
-            return redirect('/');
+            if ($usuario->activo == 1) {
+                session([
+                    'id' => $usuario->id,
+                    'username' => $usuario->username,
+                    'alias' => $usuario->alias,
+                    'tipo' => $usuario->tipo
+                ]);
+                return redirect('/');
+            } else {
+                return back()->with('error', 'Tu cuenta está desactivada. Contacta con un administrador.');
+            }
         } else {
             return back()->with('error', 'Error al iniciar sesión: credenciales incorrectas');
         }
     }
+    
 
     // Este método no deberías usarlo si los admins dan de alta usuarios.
     // Si aún así lo quieres para pruebas, lo dejo ajustado:
