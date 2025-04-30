@@ -25,19 +25,29 @@ Route::middleware('check.session')->group(function () {
 Route::post('/admin/asignar-producto', [AdminController::class, 'asignarProducto'])->name('admin.asignarProducto');
 
 
-Route::middleware(['check.session'])->group(function () {
-    Route::get('/admin', [AdminController::class, 'menu'])->name('admin.menu');
-    Route::post('/admin/registrar-usuario', [AdminController::class, 'registrarUsuario'])->name('admin.registrarUsuario');
-    Route::post('/admin/actualizar-documento', [AdminController::class, 'actualizarDocumento'])->name('admin.actualizarDocumento');
-    Route::post('/admin/actualizar-nota', [AdminController::class, 'actualizarNota'])->name('admin.actualizarNota');
-    Route::post('/admin/crear-producto', [AdminController::class, 'crearProducto'])->name('admin.crearProducto');
-    Route::get('/archivos-proyecto', [ProductoController::class, 'mostrarArchivosProyecto'])->name('proyecto.archivos');
-    Route::get('/admin/usuario/{id}/editar', [AdminController::class, 'editarUsuarioForm'])->name('admin.editarUsuarioForm');
-    Route::post('/admin/usuario/{id}/actualizar', [AdminController::class, 'actualizarUsuario'])->name('admin.actualizarUsuario');
-    Route::post('/admin/usuario/{id}/eliminar', [AdminController::class, 'eliminarUsuario'])->name('admin.eliminarUsuario');
-    Route::post('/admin/activar-usuario/{id}', [AdminController::class, 'activarUsuario'])->name('admin.activarUsuario');
+// Admin dashboard
+Route::get('/admin', [AdminController::class, 'menu'])->name('admin.menu');
 
-});
+// Usuarios
+Route::post('/admin/registrar-usuario', [AdminController::class, 'registrarUsuario'])->name('admin.registrarUsuario');
+Route::get('/admin/usuario/{id}/editar', [AdminController::class, 'editarUsuarioForm'])->name('admin.editarUsuarioForm');
+Route::post('/admin/usuario/{id}/actualizar', [AdminController::class, 'actualizarUsuario'])->name('admin.actualizarUsuario');
+Route::post('/admin/usuario/{id}/eliminar', [AdminController::class, 'eliminarUsuario'])->name('admin.eliminarUsuario');
+Route::post('/admin/activar-usuario/{id}', [AdminController::class, 'activarUsuario'])->name('admin.activarUsuario');
+
+// Productos
+Route::post('/admin/crear-producto', [AdminController::class, 'crearProducto'])->name('admin.crearProducto');
+Route::post('/admin/actualizar-documento', [AdminController::class, 'actualizarDocumento'])->name('admin.actualizarDocumento');
+
+// Proyectos
+Route::post('/admin/proyectos/crear', [AdminController::class, 'crearProyecto'])->name('admin.crearProyecto');
+Route::post('/admin/proyectos/editar', [AdminController::class, 'editarProyecto'])->name('admin.editarProyecto');
+Route::post('/admin/proyectos/asignar', [AdminController::class, 'asignarProyecto'])->name('admin.asignarProyecto');
+Route::get('/archivos-proyecto', [ProductoController::class, 'mostrarArchivosProyecto'])->name('proyecto.archivos');
+
+// Notas
+Route::post('/admin/actualizar-nota', [AdminController::class, 'actualizarNota'])->name('admin.actualizarNota');
+
 
 
 
