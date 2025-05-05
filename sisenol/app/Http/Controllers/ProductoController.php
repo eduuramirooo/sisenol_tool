@@ -8,93 +8,101 @@ use Illuminate\Support\Facades\DB;
 class ProductoController extends Controller
 {
     
-public function dashboard()
-{
-    $usuario = DB::table('usuarios')->where('id', session('id'))->first();
-
-    $productos = DB::table('productos')
-        ->join('producto_usuario', 'productos.id', '=', 'producto_usuario.producto_id')
-        ->where('producto_usuario.usuario_id', $usuario->id)
-        ->select('productos.*')
-        ->get();
-
-    $planos = DB::table('planos')->where('usuario_id', $usuario->id)->get();
-    $notas = DB::table('notas')->where('usuario_id', $usuario->id)->get();
-
-    // Buscar carpeta del proyecto del usuario
-    $proyecto = DB::table('proyecto_usuario')
-    ->join('proyectos', 'proyecto_usuario.proyecto_id', '=', 'proyectos.id')
-    ->where('proyecto_usuario.usuario_id', $usuario->id)
-    ->select('proyectos.nombre', 'proyectos.carpeta')
-    ->first();
-
-    // Obtener archivos de la carpeta del proyecto
-    $archivos = [];
-
-    if ($proyecto && $proyecto->carpeta) {
-        $rutaCompleta = public_path($proyecto->carpeta);
+    public function dashboard()
+    {
+        $usuario = DB::table('usuarios')->where('id', session('id'))->first();
     
-        if (is_dir($rutaCompleta)) {
-            $files = array_diff(scandir($rutaCompleta), ['.', '..']);
-            foreach ($files as $file) {
-                $filePath = $rutaCompleta . DIRECTORY_SEPARATOR . $file;
+        $productos = DB::table('productos')
+            ->join('producto_usuario', 'productos.id', '=', 'producto_usuario.producto_id')
+            ->where('producto_usuario.usuario_id', $usuario->id)
+            ->select('productos.*')
+            ->get();
     
-                // Ignorar carpeta llamada "nombre"
-                if (is_dir($filePath) && $file === 'notes') {
-                    continue;
+        $planos = DB::table('planos')->where('usuario_id', $usuario->id)->get();
+        $notas = DB::table('notas')->where('usuario_id', $usuario->id)->get();
+    
+        $proyecto = DB::table('proyecto_usuario')
+            ->join('proyectos', 'proyecto_usuario.proyecto_id', '=', 'proyectos.id')
+            ->where('proyecto_usuario.usuario_id', $usuario->id)
+            ->select('proyectos.nombre', 'proyectos.carpeta')
+            ->first();
+    
+        $archivos = [];
+        $notasDocs = [];
+        $debugInfo = [];
+    
+        if ($proyecto && $proyecto->carpeta) {
+            $carpeta = $proyecto->carpeta;
+            $rutaCompleta = public_path('upload/proyectos/' . $carpeta);
+            $urlBase = '/upload/proyectos/' . $carpeta;
+    
+            // Guardar info de depuración
+            $debugInfo['ruta_proyecto'] = $rutaCompleta;
+            $debugInfo['existe_carpeta'] = is_dir($rutaCompleta);
+            $debugInfo['contenido'] = is_dir($rutaCompleta) ? scandir($rutaCompleta) : [];
+    
+            if ($debugInfo['existe_carpeta']) {
+                $files = array_diff($debugInfo['contenido'], ['.', '..']);
+                foreach ($files as $file) {
+                    $filePath = $rutaCompleta . DIRECTORY_SEPARATOR . $file;
+    
+                    if (is_dir($filePath) && $file === 'notes') {
+                        continue;
+                    }
+    
+                    if (is_file($filePath)) {
+                        $archivos[] = [
+                            'nombre' => $file,
+                            'peso' => round(filesize($filePath) / 1024, 2),
+                            'url' => asset($urlBase . '/' . $file),
+                        ];
+                    }
                 }
+            }
     
-                // Solo incluir archivos (no carpetas)
-                if (is_file($filePath)) {
-                    $archivos[] = [
-                        'nombre' => $file,
-                        'peso' => round(filesize($filePath) / 1024, 2), // en KB
-                        'url' => asset($proyecto->carpeta . '/' . $file),
-                    ];
+            // Buscar archivos en notes
+            $rutaNotas = $rutaCompleta . '/notes';
+            $urlNotas = $urlBase . '/notes';
+            $debugInfo['ruta_notes'] = $rutaNotas;
+            $debugInfo['existe_notes'] = is_dir($rutaNotas);
+            $debugInfo['contenido_notes'] = is_dir($rutaNotas) ? scandir($rutaNotas) : [];
+    
+            if ($debugInfo['existe_notes']) {
+                $archivosNotas = array_diff($debugInfo['contenido_notes'], ['.', '..']);
+                foreach ($archivosNotas as $archivo) {
+                    $rutaArchivo = $rutaNotas . DIRECTORY_SEPARATOR . $archivo;
+                    if (is_file($rutaArchivo)) {
+                        $notasDocs[] = [
+                            'nombre' => $archivo,
+                            'peso' => round(filesize($rutaArchivo) / 1024, 2),
+                            'url' => asset($urlNotas . '/' . $archivo),
+                        ];
+                    }
                 }
             }
         }
+    
+        $count = $productos->count();
+        $fecha = '2024-01-01';
+        $fechaMan = '2024-03-15';
+        $cantidad = 12.5;
+    
+        return view('user.dashboard', compact(
+            'usuario',
+            'productos',
+            'planos',
+            'notas',
+            'count',
+            'fecha',
+            'fechaMan',
+            'cantidad',
+            'archivos',
+            'proyecto',
+            'notasDocs',
+            'debugInfo'
+        ));
     }
     
-$notasDocs = [];
-
-if ($proyecto && $proyecto->carpeta) {
-    $rutaNotas = public_path($proyecto->carpeta . '/notes');
-
-    if (is_dir($rutaNotas)) {
-        $archivosNotas = array_diff(scandir($rutaNotas), ['.', '..']);
-        foreach ($archivosNotas as $archivo) {
-            $rutaCompleta = $rutaNotas . DIRECTORY_SEPARATOR . $archivo;
-            $notasDocs[] = [
-                'nombre' => $archivo,
-                'peso' => round(filesize($rutaCompleta) / 1024, 2), // en KB
-                'url' => asset($proyecto->carpeta . '/notes/' . $archivo)
-            ];
-        }
-    }
-}
-
-
-
-    $count = $productos->count();
-    $fecha = '2024-01-01';
-    $fechaMan = '2024-03-15';
-    $cantidad = 12.5;
-
-    return view('user.dashboard', compact(
-        'usuario',
-        'productos',
-        'planos',
-        'notas',
-        'count',
-        'fecha',
-        'fechaMan',
-        'cantidad',
-        'archivos',
-        'proyecto',
-        'notasDocs'
-    ));
-}
 
     public function index()
     {
