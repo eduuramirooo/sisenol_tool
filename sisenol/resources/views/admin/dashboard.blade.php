@@ -177,19 +177,21 @@
 
         {{-- Editar nombre --}}
         <div class="bg-white p-5 rounded shadow space-y-4">
-            <h3 class="text-lg font-medium border-b pb-2">Editar nombre del proyecto</h3>
-            <form action="{{ route('admin.editarProyecto') }}" method="POST" class="space-y-4">@csrf
-                <select name="proyecto_id" class="w-full border px-4 py-2 rounded">
-                    @foreach($proyectos as $proyecto)
-                        <option value="{{ $proyecto->id }}">{{ $proyecto->nombre }}</option>
-                    @endforeach
-                </select>
-                <input type="text" name="nuevo_nombre" placeholder="Nuevo nombre" class="w-full border px-4 py-2 rounded">
-                <button type="submit" class="bg-black text-white px-5 py-2 rounded hover:bg-gray-800 transition w-full sm:w-auto">
-                    Actualizar
-                </button>
-            </form>
-        </div>
+    <h3 class="text-lg font-medium border-b pb-2">Editar carpeta del proyecto</h3>
+    <form action="{{ route('admin.editarProyecto') }}" method="POST" class="space-y-4">
+        @csrf
+        <select name="proyecto_id" class="w-full border px-4 py-2 rounded">
+            @foreach($proyectos as $proyecto)
+                <option value="{{ $proyecto->id }}">{{ $proyecto->nombre }}</option>
+            @endforeach
+        </select>
+        <input type="text" name="nueva_carpeta" placeholder="Nueva carpeta" class="w-full border px-4 py-2 rounded">
+        <button type="submit" class="bg-black text-white px-5 py-2 rounded hover:bg-gray-800 transition w-full sm:w-auto">
+            Actualizar
+        </button>
+    </form>
+</div>
+
 
         {{-- Asignar proyecto --}}
         <div class="bg-white p-5 rounded shadow space-y-4">
