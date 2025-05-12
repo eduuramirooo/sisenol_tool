@@ -11,6 +11,9 @@ class ProductoController extends Controller
     public function dashboard()
     {
         $usuario = DB::table('usuarios')->where('id', session('id'))->first();
+        if (!$usuario) {
+            return redirect('/formulario')->with('error', 'Usuario no encontrado o sesión expirada.');
+        }
     
         $productos = DB::table('productos')
             ->join('producto_usuario', 'productos.id', '=', 'producto_usuario.producto_id')
@@ -32,23 +35,21 @@ class ProductoController extends Controller
         $debugInfo = [];
     
         if ($proyecto && $proyecto->carpeta) {
-            $carpeta = $proyecto->carpeta;
-            $rutaCompleta = public_path('upload/proyectos/' . $carpeta);
-            $urlBase = '/upload/proyectos/' . $carpeta;
+            $rutaCompleta = $proyecto->carpeta;
+            $nombreCarpeta = basename(str_replace('\\', '/', $rutaCompleta)); // cross-platform
+            $urlBase = '/upload/proyectos/' . $nombreCarpeta;
     
-            // Guardar info de depuración
+            $isCarpeta = is_dir($rutaCompleta);
             $debugInfo['ruta_proyecto'] = $rutaCompleta;
-            $debugInfo['existe_carpeta'] = is_dir($rutaCompleta);
-            $debugInfo['contenido'] = is_dir($rutaCompleta) ? scandir($rutaCompleta) : [];
+            $debugInfo['existe_carpeta'] = $isCarpeta;
+            $debugInfo['contenido'] = $isCarpeta ? scandir($rutaCompleta) : [];
     
-            if ($debugInfo['existe_carpeta']) {
+            if ($isCarpeta) {
                 $files = array_diff($debugInfo['contenido'], ['.', '..']);
                 foreach ($files as $file) {
                     $filePath = $rutaCompleta . DIRECTORY_SEPARATOR . $file;
     
-                    if (is_dir($filePath) && $file === 'notes') {
-                        continue;
-                    }
+                    if (is_dir($filePath) && $file === 'notes') continue;
     
                     if (is_file($filePath)) {
                         $archivos[] = [
@@ -60,12 +61,12 @@ class ProductoController extends Controller
                 }
             }
     
-            // Buscar archivos en notes
-            $rutaNotas = $rutaCompleta . '/notes';
+            // Archivos de la carpeta "notes"
+            $rutaNotas = $rutaCompleta . DIRECTORY_SEPARATOR . 'notes';
             $urlNotas = $urlBase . '/notes';
             $debugInfo['ruta_notes'] = $rutaNotas;
             $debugInfo['existe_notes'] = is_dir($rutaNotas);
-            $debugInfo['contenido_notes'] = is_dir($rutaNotas) ? scandir($rutaNotas) : [];
+            $debugInfo['contenido_notes'] = $debugInfo['existe_notes'] ? scandir($rutaNotas) : [];
     
             if ($debugInfo['existe_notes']) {
                 $archivosNotas = array_diff($debugInfo['contenido_notes'], ['.', '..']);
@@ -81,27 +82,21 @@ class ProductoController extends Controller
                 }
             }
         }
-    
-        $count = $productos->count();
-        $fecha = '2024-01-01';
-        $fechaMan = '2024-03-15';
-        $cantidad = 12.5;
-    
+        
         return view('user.dashboard', compact(
             'usuario',
             'productos',
             'planos',
             'notas',
-            'count',
-            'fecha',
-            'fechaMan',
-            'cantidad',
             'archivos',
             'proyecto',
-            'notasDocs',
-            'debugInfo'
+            'notasDocs'
+            
         ));
     }
+    
+    
+    
     
 
     public function index()

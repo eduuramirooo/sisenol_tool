@@ -107,16 +107,48 @@
     </div>
 
     <div id="productos-layout" class="flex flex-col gap-6 md:grid md:grid-cols-1 transition-all duration-300">
-        {{-- Crear producto --}}
-        <div class="bg-white p-6 rounded shadow space-y-6">
-            <h3 class="text-xl font-medium border-b pb-2">Crear nuevo producto</h3>
-            <form action="{{ route('admin.crearProducto') }}" method="POST" enctype="multipart/form-data" class="space-y-4">@csrf
-                <input type="text" name="nombre" placeholder="Nombre del producto" class="w-full border px-4 py-2 rounded">
-                <input type="text" name="descripcion" placeholder="Descripción" class="w-full border px-4 py-2 rounded">
-                <input type="file" name="imagen" accept="image/*" class="w-full border px-4 py-2 rounded">
-                <button type="submit" class="bg-black text-white px-6 py-3 rounded hover:bg-gray-800 transition">Crear</button>
-            </form>
+    {{-- Crear producto --}}
+    {{-- Crear producto --}}
+<div class="bg-white p-6 rounded shadow space-y-6">
+    <h3 class="text-xl font-medium border-b pb-2">Crear nuevo producto</h3>
+
+    <form action="{{ route('admin.crearProducto') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+        @csrf
+
+        {{-- Nombre del producto --}}
+        <div>
+            <label for="nombre" class="block text-sm font-semibold mb-1">Nombre del producto</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Ej: Producto A" class="w-full border px-4 py-2 rounded">
         </div>
+
+        {{-- Descripción --}}
+        <div>
+            <label for="descripcion" class="block text-sm font-semibold mb-1">Descripción</label>
+            <input type="text" id="descripcion" name="descripcion" placeholder="Breve descripción" class="w-full border px-4 py-2 rounded">
+        </div>
+
+        {{-- Imagen del producto --}}
+        <div>
+            <label for="imagen" class="block text-sm font-semibold mb-1">Imagen del producto</label>
+            <input type="file" id="imagen" name="imagen" accept="image/*" class="w-full border px-4 py-2 rounded">
+            <p class="text-xs text-gray-500 mt-1">Formatos permitidos: jpg, jpeg, png, gif (máx. 2MB)</p>
+        </div>
+
+        {{-- Documentos relacionados --}}
+        <div>
+            <label for="documentos" class="block text-sm font-semibold mb-1">Documentos (PDFs, Word, etc.)</label>
+            <input type="file" id="documentos" name="documentos[]" multiple class="w-full border px-4 py-2 rounded">
+            <p class="text-xs text-gray-500 mt-1">Puedes subir varios documentos. Se guardarán juntos en un archivo ZIP.</p>
+        </div>
+
+        {{-- Botón --}}
+        <button type="submit" class="bg-black text-white px-6 py-3 rounded hover:bg-gray-800 transition">
+            Crear
+        </button>
+    </form>
+</div>
+
+
 
         {{-- Asignar producto --}}
         <div class="bg-white p-6 rounded shadow space-y-6">
@@ -136,19 +168,37 @@
             </form>
         </div>
 
-        {{-- Subir documento --}}
-        <div class="bg-white p-6 rounded shadow space-y-6">
-            <h3 class="text-xl font-medium border-b pb-2">Subir documento PDF a producto</h3>
-            <form action="{{ route('admin.actualizarDocumento') }}" method="POST" enctype="multipart/form-data" class="space-y-4">@csrf
-                <select name="producto_id" class="w-full border px-4 py-2 rounded">
-                    @foreach($productos as $producto)
-                        <option value="{{ $producto->id }}">{{ $producto->nombre }}</option>
-                    @endforeach
-                </select>
-                <input type="file" name="documento" accept="application/pdf" class="w-full border px-4 py-2 rounded">
-                <button type="submit" class="bg-black text-white px-6 py-3 rounded hover:bg-gray-800 transition">Subir</button>
-            </form>
+        {{-- Subir documentos --}}
+<div class="bg-white p-6 rounded shadow space-y-6">
+    <h3 class="text-xl font-medium border-b pb-2">Actualizar documentos de un producto</h3>
+
+    <form action="{{ route('admin.actualizarDocumento') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+        @csrf
+
+        {{-- Selección del producto --}}
+        <div>
+            <label for="producto_id" class="block text-sm font-semibold mb-1">Selecciona un producto</label>
+            <select id="producto_id" name="producto_id" class="w-full border px-4 py-2 rounded">
+                @foreach($productos as $producto)
+                    <option value="{{ $producto->id }}">{{ $producto->nombre }}</option>
+                @endforeach
+            </select>
         </div>
+
+        {{-- Subida múltiple de documentos --}}
+        <div>
+            <label for="documento" class="block text-sm font-semibold mb-1">Selecciona documentos (varios permitidos)</label>
+            <input type="file" id="documento" name="documento[]" multiple class="w-full border px-4 py-2 rounded">
+            <p class="text-xs text-gray-500 mt-1">Puedes subir cualquier tipo de archivo (máx. 10 MB por archivo).</p>
+        </div>
+
+        <button type="submit" class="bg-black text-white px-6 py-3 rounded hover:bg-gray-800 transition">
+            Subir documentos
+        </button>
+    </form>
+</div>
+
+
     </div>
 </div>
 
@@ -164,16 +214,23 @@
 
     {{-- Bloques de gestión --}}
     <div id="proyectos-layout" class="flex flex-col gap-6 md:grid md:grid-cols-1 transition-all duration-300 mb-10">
-        {{-- Crear proyecto --}}
-        <div class="bg-white p-5 rounded shadow space-y-4">
-            <h3 class="text-lg font-medium border-b pb-2">Crear nuevo proyecto</h3>
-            <form action="{{ route('admin.crearProyecto') }}" method="POST" class="space-y-4">@csrf
-                <input type="text" name="nombre" placeholder="Nombre del proyecto" class="w-full border px-4 py-2 rounded">
-                <button type="submit" class="bg-black text-white px-5 py-2 rounded hover:bg-gray-800 transition w-full sm:w-auto">
-                    Crear
-                </button>
-            </form>
-        </div>
+    {{-- Crear proyecto --}}
+<div class="bg-white p-5 rounded shadow space-y-4">
+    <h3 class="text-lg font-medium border-b pb-2">Crear nuevo proyecto</h3>
+
+    <form action="{{ route('admin.crearProyecto') }}" method="POST" class="space-y-4">
+        @csrf
+
+        <input type="text" name="nombre" placeholder="Nombre del proyecto" class="w-full border px-4 py-2 rounded" required>
+
+        <input type="text" name="carpeta" placeholder="Ruta completa de la carpeta (ej: \\DESKTOP-R9K7UMI\Sisenol\proyecto1)" class="w-full border px-4 py-2 rounded" required>
+
+        <button type="submit" class="bg-black text-white px-5 py-2 rounded hover:bg-gray-800 transition w-full sm:w-auto">
+            Crear
+        </button>
+    </form>
+</div>
+
 
         {{-- Editar nombre --}}
         <div class="bg-white p-5 rounded shadow space-y-4">
@@ -231,7 +288,7 @@
                     <tr class="border-t">
                         <td class="px-4 py-2">{{ $proyecto->id }}</td>
                         <td class="px-4 py-2">{{ $proyecto->nombre }}</td>
-                        <td class="px-4 py-2">upload/proyectos/{{ $proyecto->carpeta ?? Str::slug($proyecto->nombre, '_') }}</td>
+                        <td class="px-4 py-2">{{ $proyecto->carpeta ?? Str::slug($proyecto->nombre, '_') }}</td>
                         <td class="px-4 py-2">
                             @forelse($proyecto->usuarios as $usuario)
                                 <span class="inline-block bg-gray-200 text-gray-800 px-2 py-1 rounded text-xs mr-1 mb-1">
@@ -250,13 +307,44 @@
 
 
 
-    <!-- Sección: Notas -->
-    <div id="seccion-notas" class="hidden opacity-0 transition-opacity duration-500">
-        <h2 class="text-lg font-semibold">Modificar notas</h2>
-        <p>Listado y edición de notas por usuario.</p>
-        <!-- Por implementar -->
+<!-- Sección: Notas -->
+<div id="seccion-notas" class="hidden opacity-0 transition-opacity duration-500">
+    <div class="flex justify-between items-center mb-8">
+        <h2 class="text-2xl font-semibold">Gestión de notas</h2>
+    </div>
+
+    <div class="flex flex-col gap-6 md:grid md:grid-cols-1 transition-all duration-300 mb-10">
+        <!-- Formulario de creación de nota -->
+        <div class="bg-white p-6 rounded shadow space-y-6">
+            <h3 class="text-xl font-medium border-b pb-2">Crear nueva nota</h3>
+            <form action="{{ route('notas.guardar') }}" method="POST" class="space-y-4">@csrf
+                <select name="usuario_id" class="w-full border px-4 py-2 rounded" required>
+                    <option value="">-- Selecciona un usuario --</option>
+                    @foreach($usuarios as $usuario)
+                        <option value="{{ $usuario->id }}">{{ $usuario->alias }} ({{ $usuario->username }})</option>
+                    @endforeach
+                </select>
+
+                <textarea name="contenido" rows="4" placeholder="Escribe la nota aquí..." class="w-full border px-4 py-2 rounded" required></textarea>
+
+                <button type="submit" class="bg-black text-white px-6 py-3 rounded hover:bg-gray-800 transition">
+                    Guardar nota
+                </button>
+            </form>
+
+            @if (session('success'))
+                <div class="text-green-600 mt-2">{{ session('success') }}</div>
+            @endif
+            @if (session('error'))
+                <div class="text-red-600 mt-2">{{ session('error') }}</div>
+            @endif
+        </div>
+
     </div>
 </div>
+
+
+
 
 
 <script src="{{ asset('js/admin.js') }}" defer></script>

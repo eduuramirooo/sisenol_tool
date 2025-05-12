@@ -47,6 +47,8 @@ Route::get('/archivos-proyecto', [ProductoController::class, 'mostrarArchivosPro
 
 // Notas
 Route::post('/admin/actualizar-nota', [AdminController::class, 'actualizarNota'])->name('admin.actualizarNota');
+Route::post('/notas/guardar', [TuControlador::class, 'guardarNota'])->name('notas.guardar');
+
 
 
 
