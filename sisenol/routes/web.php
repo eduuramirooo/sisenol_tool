@@ -21,6 +21,8 @@ Route::middleware('check.session')->group(function () {
     Route::get('/instalacion', [ProductoController::class, 'instalacion'])->name('producto.instalacion');
     Route::get('/notas', [ProductoController::class, 'notas'])->name('producto.notas');
     Route::get('/descargar/{id}', [ProductoController::class, 'descargar'])->name('producto.descargar');
+    Route::get('/descargar-archivo', [ProductoController::class, 'descargarPorRuta'])->name('descargar.ruta');
+
 });
 Route::post('/admin/asignar-producto', [AdminController::class, 'asignarProducto'])->name('admin.asignarProducto');
 

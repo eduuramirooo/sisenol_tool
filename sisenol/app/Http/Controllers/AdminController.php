@@ -79,7 +79,7 @@ class AdminController extends Controller
         // Datos adicionales (puedes adaptar o eliminar según el caso real)
         $count = $productos->count();
         $fecha = now()->toDateString();
-        $fechaMan = now()->addMonths(2)->toDateString(); // ejemplo
+        $fechaMan = now()->addMonths(2)->toDateString(); 
         $cantidad = 12.5;
     
         return view('user.dashboard', compact(
@@ -163,64 +163,65 @@ class AdminController extends Controller
 
 
 
-    public function crearProducto(Request $request)
-    {
-        try {
-            $request->validate([
-                'nombre' => 'required|string|max:255',
-                'descripcion' => 'required|string',
-                'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'documentos.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,txt|max:5120',
-            ]);
-    
-            $nombreSlug = strtolower(str_replace(' ', '_', $request->nombre));
-            $rutaBase = public_path('upload/productos');
-            $rutaImagen = null;
-            $rutaZip = null;
-    
-            // 1. Guardar imagen
-            if ($request->hasFile('imagen')) {
-                $imagen = $request->file('imagen');
-                $nombreImagen = 'producto_' . $nombreSlug . '.' . $imagen->getClientOriginalExtension();
-                $imagen->move($rutaBase, $nombreImagen);
-                $rutaImagen = '/upload/productos/' . $nombreImagen;
-            }
-    
-            // 2. Guardar documentos y crear ZIP
-            $archivosZip = [];
-            if ($request->hasFile('documentos')) {
-                $zip = new ZipArchive();
-                $nombreZip = 'documentos_' . $nombreSlug . '.zip';
-                $zipPath = $rutaBase . '/' . $nombreZip;
-    
-                if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
-                    foreach ($request->file('documentos') as $documento) {
-                        $docName = $documento->getClientOriginalName();
-                        $zip->addFromString($docName, file_get_contents($documento->getRealPath()));
-                    }
-                    $zip->close();
-                    $rutaZip = '/upload/productos/' . $nombreZip;
-                } else {
-                    return redirect()->route('admin.menu')->with('error', 'No se pudo crear el archivo ZIP.');
-                }
-            }
-    
-            // 3. Insertar en la base de datos
-            DB::table('productos')->insert([
-                'nombre' => $request->nombre,
-                'descripcion' => $request->descripcion,
-                'imagen' => $rutaImagen,
-                'documentos_zip' => $rutaZip, // Asegúrate de tener este campo en la tabla
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-    
-            return redirect()->route('admin.menu')->with('success', 'Producto creado correctamente.');
-        } catch (\Exception $e) {
-            Log::error('Error al crear producto: ' . $e->getMessage());
-            return redirect()->route('admin.menu')->with('error', 'Hubo un problema al crear el producto.');
+   public function crearProducto(Request $request)
+{
+    try {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'required|string',
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'documentos.*' => 'nullable|file', // Elimina restricción de tipo y tamaño
+        ]);
+
+        $nombreSlug = strtolower(str_replace(' ', '_', $request->nombre));
+        $rutaBase = public_path('upload/productos');
+        $rutaImagen = null;
+        $rutaZip = null;
+
+        // 1. Guardar imagen
+        if ($request->hasFile('imagen')) {
+            $imagen = $request->file('imagen');
+            $nombreImagen = 'producto_' . $nombreSlug . '.' . $imagen->getClientOriginalExtension();
+            $imagen->move($rutaBase, $nombreImagen);
+            $rutaImagen = '/upload/productos/' . $nombreImagen;
         }
+
+        // 2. Guardar documentos y crear ZIP
+        $archivosZip = [];
+        if ($request->hasFile('documentos')) {
+            $zip = new ZipArchive();
+            $nombreZip = 'documentos_' . $nombreSlug . '.zip';
+            $zipPath = $rutaBase . '/' . $nombreZip;
+
+            if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
+                foreach ($request->file('documentos') as $documento) {
+                    $docName = $documento->getClientOriginalName();
+                    $zip->addFromString($docName, file_get_contents($documento->getRealPath()));
+                }
+                $zip->close();
+                $rutaZip = '/upload/productos/' . $nombreZip;
+            } else {
+                return redirect()->route('admin.menu')->with('error', 'No se pudo crear el archivo ZIP.');
+            }
+        }
+
+        // 3. Insertar en la base de datos
+        DB::table('productos')->insert([
+            'nombre' => $request->nombre,
+            'descripcion' => $request->descripcion,
+            'imagen' => $rutaImagen,
+            'documento' => $rutaZip,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('admin.menu')->with('success', 'Producto creado correctamente.');
+    } catch (\Exception $e) {
+        Log::error('Error al crear producto: ' . $e->getMessage());
+        return redirect()->route('admin.menu')->with('error', 'Hubo un problema al crear el producto.');
     }
+}
+
     
 
     public function asignarProducto(Request $request)
@@ -232,6 +233,8 @@ class AdminController extends Controller
 
         return redirect()->route('admin.menu')->with('success', 'Producto asignado correctamente.');
     }
+
+
 
     public function actualizarDocumento(Request $request)
     {

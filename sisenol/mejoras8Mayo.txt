@@ -1,1 +1,0 @@
-cambiar ruta a la ruta entera a la carpeta de bbdd

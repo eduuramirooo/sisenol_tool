@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Producto; // Asegúrate de tener este modelo
+use App\Models\Producto; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Response;    
 class ProductoController extends Controller
 {
     
@@ -36,7 +37,7 @@ class ProductoController extends Controller
     
         if ($proyecto && $proyecto->carpeta) {
             $rutaCompleta = $proyecto->carpeta;
-            $nombreCarpeta = basename(str_replace('\\', '/', $rutaCompleta)); // cross-platform
+            $nombreCarpeta = basename(str_replace('\\', '/', $rutaCompleta)); 
             $urlBase = '/upload/proyectos/' . $nombreCarpeta;
     
             $isCarpeta = is_dir($rutaCompleta);
@@ -52,11 +53,13 @@ class ProductoController extends Controller
                     if (is_dir($filePath) && $file === 'notes') continue;
     
                     if (is_file($filePath)) {
-                        $archivos[] = [
-                            'nombre' => $file,
-                            'peso' => round(filesize($filePath) / 1024, 2),
-                            'url' => asset($urlBase . '/' . $file),
-                        ];
+                            $archivos[] = [
+                        'nombre' => $file,
+                        'peso' => round(filesize($filePath) / 1024, 2),
+                        'url' => asset($urlBase . '/' . $file),
+                        'ruta_real' => $filePath, //  Aquí está la solución
+                    ];
+
                     }
                 }
             }
@@ -68,19 +71,21 @@ class ProductoController extends Controller
             $debugInfo['existe_notes'] = is_dir($rutaNotas);
             $debugInfo['contenido_notes'] = $debugInfo['existe_notes'] ? scandir($rutaNotas) : [];
     
-            if ($debugInfo['existe_notes']) {
-                $archivosNotas = array_diff($debugInfo['contenido_notes'], ['.', '..']);
-                foreach ($archivosNotas as $archivo) {
-                    $rutaArchivo = $rutaNotas . DIRECTORY_SEPARATOR . $archivo;
-                    if (is_file($rutaArchivo)) {
-                        $notasDocs[] = [
-                            'nombre' => $archivo,
-                            'peso' => round(filesize($rutaArchivo) / 1024, 2),
-                            'url' => asset($urlNotas . '/' . $archivo),
-                        ];
-                    }
-                }
-            }
+if ($debugInfo['existe_notes']) {
+    $archivosNotas = array_diff($debugInfo['contenido_notes'], ['.', '..']);
+    foreach ($archivosNotas as $archivo) {
+        $rutaArchivo = $rutaNotas . DIRECTORY_SEPARATOR . $archivo;
+        if (is_file($rutaArchivo)) {
+            $notasDocs[] = [
+                'nombre' => $archivo,
+                'peso' => round(filesize($rutaArchivo) / 1024, 2),
+                'url' => asset($urlNotas . '/' . $archivo),
+                'ruta' => $rutaArchivo, // <-- Agregamos esto
+            ];
+        }
+    }
+}
+
         }
         
         return view('user.dashboard', compact(
@@ -115,6 +120,23 @@ class ProductoController extends Controller
             return redirect()->back()->with('error', 'El archivo no se encontró');
         }
     }
+
+public function descargarPorRuta(Request $request)
+{
+    $ruta = urldecode($request->input('ruta'));
+
+    if (!str_starts_with($ruta, '\\\\DESKTOP-R9K7UMI\\Sisenol\\proyectosolar')) {
+        return redirect()->back()->with('error', 'Ruta no permitida.');
+    }
+
+    $ruta = str_replace('\\', DIRECTORY_SEPARATOR, $ruta);
+
+    if (file_exists($ruta)) {
+        return Response::download($ruta);
+    } else {
+        return redirect()->back()->with('error', 'El archivo no se encontró.');
+    }
+}
 
     public function web($id)    
     {

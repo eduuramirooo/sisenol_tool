@@ -50,13 +50,14 @@
     @if(count($archivos) > 0)
         <ul class="bg-white rounded shadow divide-y divide-gray-200">
             @foreach($archivos as $archivo)
-                <li class="flex items-center justify-between px-4 py-3 hover:bg-[#F0F4F3] transition">
-                    <a href="{{ $archivo['url'] }}" download class="text-[#216869] font-medium hover:underline">
-                        {{ $archivo['nombre'] }}
-                    </a>
-                    <span class="text-sm text-gray-500">{{ $archivo['peso'] }} KB</span>
-                </li>
-            @endforeach
+    <li class="flex items-center justify-between px-4 py-3 hover:bg-[#F0F4F3] transition">
+        <a href="{{ route('descargar.ruta', ['ruta' => $archivo['ruta_real']]) }}" class="text-[#216869] font-medium hover:underline">
+            {{ $archivo['nombre'] }}
+        </a>
+        <span class="text-sm text-gray-500">{{ $archivo['peso'] }} KB</span>
+    </li>
+@endforeach
+
         </ul>
     @else
         <p class="text-gray-500 text-center">No hay archivos disponibles.</p>
@@ -78,20 +79,22 @@
         </div>
     @endforeach
 
-    {{-- Documentos en la carpeta proyecto/notes --}}
-    @if (!empty($notasDocs))
-        <h3 class="text-md font-medium mt-6 mb-2">Archivos adjuntos</h3>
-        <ul class="space-y-2">
-            @foreach ($notasDocs as $doc)
-                <li class="flex justify-between items-center bg-white border p-3 rounded shadow-sm hover:bg-gray-50">
-                    <a href="{{ $doc['url'] }}" download class="text-[#216869] font-medium hover:underline">
-                        {{ $doc['nombre'] }}
-                    </a>
-                    <span class="text-sm text-gray-500">{{ $doc['peso'] }} KB</span>
-                </li>
-            @endforeach
-        </ul>
-    @endif
+{{-- Documentos en la carpeta proyecto/notes --}}
+@if (!empty($notasDocs))
+    <h3 class="text-md font-medium mt-6 mb-2">Archivos adjuntos</h3>
+    <ul class="space-y-2">
+        @foreach ($notasDocs as $doc)
+            <li class="flex justify-between items-center bg-white border p-3 rounded shadow-sm hover:bg-gray-50">
+                <a href="{{ route('descargar.ruta', ['ruta' => urlencode($doc['ruta'])]) }}"
+                   class="text-[#216869] font-medium hover:underline">
+                    {{ $doc['nombre'] }}
+                </a>
+                <span class="text-sm text-gray-500">{{ $doc['peso'] }} KB</span>
+            </li>
+        @endforeach
+    </ul>
+@endif
+
 </div>
 
 
